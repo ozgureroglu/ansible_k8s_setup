@@ -1,0 +1,2 @@
+# User env_var to capture the join command and use it on worker nodes.
+join_command_file: join_command.txt

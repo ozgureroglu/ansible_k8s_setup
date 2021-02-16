@@ -1,0 +1,23 @@
+- hosts: k8smaster 
+  vars_files:
+    - ../vars/main.yml
+  tasks:     
+
+  - name: Generate output 
+    command: echo "hello world"
+    become_user: root
+    register: join_command
+    tags:
+      - join_command
+
+  - name: Write to local file
+    shell: "echo {{join_command.stdout}} > join_command.txt"
+    tags:
+      - join_command
+
+  - name: Copy join command out to a file
+    become_user: root
+    run_once: yes
+    fetch: src="join_command.txt" dest="{{join_command_env}}" flat=yes
+    tags:
+      - join_command

@@ -1,0 +1,26 @@
+# Bu ansible dosyasi kubernetes kurma islemini hizlandirmak icin yapilmistir.
+
+# Burada tum kube nodelarini gostermektedir.
+[k8s]
+192.168.3.111
+192.168.3.121
+192.168.3.122
+
+[k8smaster]
+192.168.3.111
+
+[k8sworker]
+192.168.3.121
+192.168.3.122
+
+# Connection settings : Change depending on your target servers
+[all:vars]
+ansible_connection='ssh'
+ansible_ssh_port='22'
+ansible_user='ozgur'
+ansible_become=yes
+ansible_become_password='eroglu'
+ansible_become_method='sudo'
+#ansible_ssh_pass='secretpassword'  # "sshpass" package is required for use "ansible_ssh_pass"
+ansible_ssh_private_key_file= ./files/id_rsa_pm_vm
+# ansible_python_interpreter='/usr/bin/python3'  # is required for use python3

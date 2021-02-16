@@ -1,0 +1,42 @@
+- hosts: k8smaster 
+  vars_files:
+    - ../vars/main.yml
+  tasks:     
+  # Initialize the cluster using kubeadm
+  - name: Initialize the Kubernetes cluster using kubeadm
+    command: kubeadm init --apiserver-advertise-address="192.168.3.111" --kubernetes-version stable-1.19
+
+  - name: Setup kubeconfig for {{ansible_user}} user
+    command: "{{ item }}"
+    with_items:
+     - mkdir -p /home/{{ansible_user}}/.kube
+     - cp -i /etc/kubernetes/admin.conf /home/{{ansible_user}}/.kube/config
+     - chown -R {{ansible_user}}:{{ansible_user}} /home/{{ansible_user}}/.kube
+
+  - name: Install weave pod network
+    become: yes
+    become_user: "{{ansible_user}}"
+    command: "{{ item }}"
+    with_items:
+    - kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=1.19&env.IPALLOC_RANGE=10.30.0.0/24"
+
+  - name: Generate join command
+    command: kubeadm token create --print-join-command
+    become_user: root
+    register: join_command
+    tags:
+      - copy_join_command
+
+
+  - name: Write to local file
+    shell: "echo {{join_command.stdout}} > join_command.txt"
+    tags:
+      - copy_join_command
+
+
+  - name: Copy join command out to a file
+    become_user: root
+    run_once: yes
+    fetch: src="join_command.txt" dest="{{join_command_file}}" flat=yes
+    tags:
+      - copy_join_command

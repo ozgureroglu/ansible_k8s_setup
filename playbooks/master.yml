@@ -4,7 +4,7 @@
   tasks:     
   # Initialize the cluster using kubeadm
   - name: Initialize the Kubernetes cluster using kubeadm
-    command: kubeadm init --apiserver-advertise-address="192.168.3.111" --kubernetes-version stable-1.19
+    command: kubeadm init --apiserver-advertise-address="{{groups['k8smaster'][0]}}" --kubernetes-version stable-1.19
 
   - name: Setup kubeconfig for {{ansible_user}} user
     command: "{{ item }}"
